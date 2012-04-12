@@ -14,13 +14,17 @@
  */
 
 #include "linefitti.h"
+
+ #include <jack/jack.h>
+ #include "libol.h"
+
 #include <stdlib.h>
 #include <GL/glut.h>
 #include <GL/glu.h>
 #include <stdio.h>
 #include <math.h>
 
-#define MAXPTS 3000
+#define MAXPTS 300
 
 #define INACTIVE GLUT_UP 
 #define ACTIVE GLUT_DOWN
@@ -148,32 +152,45 @@ void addNewPoint( float x, float y, int state ) {
 	PointArray[NumPts][1] = y;
 	PointArray[NumPts][2] = state;
 
+	//PointArray[NumPts+1][2] = INACTIVE;
+
 	printf("%d) x: %f, y: %f, st: %d\n",NumPts,x,y,state);
 
 	NumPts++;
 	
 }
 
+
+	
 void displayLines(void){
+
+
 	int i;
 
 	glClear(GL_COLOR_BUFFER_BIT);
-
+	olLoadIdentity();
 	
 	if ( NumPts>1 ) {
 		glBegin( GL_LINE_STRIP );
+		olBegin(OL_LINESTRIP);
 		for ( i=0; i<MAXPTS; i++ ) {
-			if(PointArray[i][2] == INACTIVE || i == NumPts || i == NumPts-1)
+			if(PointArray[i][2] == INACTIVE || i == NumPts || i == NumPts-1){
 				glColor3f(0.0f, 0.0f, 0.0f); // Black line
-			else
+				olVertex( PointArray[i][0], PointArray[i][1], C_BLACK );
+
+			} else {
 				glColor3f(1.0f, 1.0f, 1.0f); // White line
+				olVertex( PointArray[i][0], PointArray[i][1], C_WHITE );
+			}
 
 				
-
+			
 			glVertex2f( PointArray[i][0], PointArray[i][1] );
 		}
+		olEnd();
 		glEnd();
 	}
+	olRenderFrame(60);
 
 
 
@@ -200,10 +217,31 @@ void resizeWindow(int w, int h){
 }
 
 int main(int argc, char** argv){
-	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB ); 
+	OLRenderParams params;
 
-	glutInitWindowSize(500, 500);
+	memset(&params, 0, sizeof params);
+	params.rate = 48000;
+	params.on_speed = 2.0/100.0;
+	params.off_speed = 2.0/20.0;
+	params.start_wait = 8;
+	params.start_dwell = 3;
+	params.curve_dwell = 0;
+	params.corner_dwell = 8;
+	params.curve_angle = cosf(30.0*(M_PI/180.0)); // 30 deg
+	params.end_dwell = 3;
+	params.end_wait = 7;
+	params.snap = 1/100000.0;
+	params.render_flags = RENDER_GRAYSCALE;
+
+	if(olInit(3, 30000) < 0)
+			return 1;
+
+	olSetRenderParams(&params);
+
+	glutInit(&argc, argv);
+
+	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB ); 
+	glutInitWindowSize(640, 640);
 	glutInitWindowPosition(1800, 200);
 
 	glutCreateWindow("Le Lineffiti"); // Create window
