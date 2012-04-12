@@ -4,7 +4,7 @@
   <socket exclusive="off" client="libol" type="jack-audio" name="OUT">
    <plug>out_x</plug>
    <plug>out_y</plug>
-   <plug>out_r</plug>
+   <plug>out_g</plug>
   </socket>
  </output-sockets>
  <input-sockets>
