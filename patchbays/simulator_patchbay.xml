@@ -1,0 +1,32 @@
+<!DOCTYPE patchbay>
+<patchbay version="0.3.8" name="simulator_patchbay">
+ <output-sockets>
+  <socket exclusive="off" client="libol" type="jack-audio" name="OUT_X">
+   <plug>out_x</plug>
+  </socket>
+  <socket exclusive="off" client="libol" type="jack-audio" name="OUT_Y">
+   <plug>out_y</plug>
+  </socket>
+  <socket exclusive="off" client="libol" type="jack-audio" name="OUT_G">
+   <plug>out_g</plug>
+  </socket>
+ </output-sockets>
+ <input-sockets>
+  <socket exclusive="off" client="simulator" type="jack-audio" name="SIM_IN_X">
+   <plug>in_x</plug>
+  </socket>
+  <socket exclusive="off" client="simulator" type="jack-audio" name="SIM_IN_Y">
+   <plug>in_y</plug>
+  </socket>
+  <socket exclusive="off" client="simulator" type="jack-audio" name="SIM_IN_G">
+   <plug>in_g</plug>
+  </socket>
+ </input-sockets>
+ <slots/>
+ <cables>
+  <cable output="OUT_X" input="SIM_IN_X" type="jack-audio"/>
+  <cable output="OUT_Y" input="SIM_IN_Y" type="jack-audio"/>
+  <cable output="OUT_G" input="SIM_IN_G" type="jack-audio"/>
+ </cables>
+</patchbay>
+
