@@ -15,8 +15,8 @@
 
 #include "linefitti.h"
 
- #include <jack/jack.h>
- #include "libol.h"
+#include <jack/jack.h>
+#include "libol.h"
 
 #include <stdlib.h>
 #include <GL/glut.h>
@@ -72,8 +72,8 @@ void removeFirstPoint() {
 void mouseManager( int button, int state, int x, int y ) {
 	printf("button: %d, state: %d\n",button, state);
 
-	float xPos = ((float)x)/((float)(WindowWidth-1));
-	float yPos = ((float)y)/((float)(WindowHeight-1));
+	float xPos = ((float)x-(float)(WindowWidth)/2)/((float)(WindowWidth)/2);
+	float yPos = ((float)y)/((float)(WindowHeight)/2);
 
 	yPos = 1.0f-yPos;			// Flip value since y position is from top row.
 
@@ -88,8 +88,8 @@ void mouseManager( int button, int state, int x, int y ) {
 
 // Left button presses place a control point.
 void mouseMovedPressed( int x, int y ) {
-	float xPos = ((float)x)/((float)(WindowWidth-1));
-	float yPos = ((float)y)/((float)(WindowHeight-1));
+	float xPos = ((float)x-(float)(WindowWidth)/2)/((float)(WindowWidth)/2);
+	float yPos = ((float)y)/((float)(WindowHeight)/2);
 
 	yPos = 1.0f-yPos;			// Flip value since y position is from top row.
 	
@@ -100,9 +100,10 @@ void mouseMovedPressed( int x, int y ) {
 
 // Left button presses place a control point.
 void mouseMoved( int x, int y ) {
-	float xPos = ((float)x)/((float)(WindowWidth-1));
-	float yPos = ((float)y)/((float)(WindowHeight-1));
-
+	
+	float xPos = ((float)x-(float)(WindowWidth)/2)/((float)(WindowWidth)/2);
+	float yPos = ((float)y)/((float)(WindowHeight)/2);
+	//printf("x: %d, y: %d -- xPos: %f, yPos: %f\n",x,y,xPos,yPos);
 	yPos = 1.0f-yPos;			// Flip value since y position is from top row.
 	
 	glutPostRedisplay();
@@ -119,14 +120,13 @@ void removeLastPoint() {
 // Move the pointer to the starting position
 void removeAllPoints() {
 	int i;
-	for(i=0;i<NumPts;i++){
+	for(i=0;i<MAXPTS;i++){
 		PointArray[i][0] = 0;
 		PointArray[i][1] = 0;
 		PointArray[i][2] = INACTIVE;
 
 	}
 	NumPts = 0;
-
 }
 
 // Add a new point to the end of the list.  
@@ -137,7 +137,6 @@ void addNewPoint( float x, float y, int state ) {
 		//removeFirstPoint();
 	}
 
-
 	PointArray[NumPts][0] = x;
 	PointArray[NumPts][1] = y;
 	PointArray[NumPts][2] = state;
@@ -147,7 +146,6 @@ void addNewPoint( float x, float y, int state ) {
 	printf("%d) x: %f, y: %f, st: %d\n",NumPts,x,y,state);
 
 	NumPts++;
-	
 }
 
 
@@ -178,17 +176,15 @@ void displayLines(void){
 	}
 	olRenderFrame(60);
 
-
-
 	glFlush();
 }
 
 void initRendering() {
-	// Black background
-	glClearColor( 0.0f, 0.0f, 0.0f, 0.0f );
-	// Line width
-	glLineWidth(1);
+	glClearColor( 0.0f, 0.0f, 0.0f, 0.0f ); // Black background
+	glLineWidth(1); // Line width
 
+	//glEnable(GL_LINE_SMOOTH);
+	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);		// Antialias the lines
 }
 
 void resizeWindow(int w, int h){
@@ -197,7 +193,7 @@ void resizeWindow(int w, int h){
 	glViewport(0, 0, (GLsizei) w, (GLsizei) h);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluOrtho2D(0.0f, 1.0f, 0.0f, 1.0f);  // Always view [0,1]x[0,1].
+	gluOrtho2D(-1,1,-1,1);  // Always view [0,1]x[0,1].
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 }
@@ -220,7 +216,7 @@ int main(int argc, char** argv){
 	params.render_flags = RENDER_GRAYSCALE;
 
 	if(olInit(3, 30000) < 0)
-			return 1;
+		return 1;
 
 	olSetRenderParams(&params);
 
@@ -241,7 +237,8 @@ int main(int argc, char** argv){
 	glutMotionFunc(mouseMovedPressed);
 	glutPassiveMotionFunc(mouseMoved);
 
-	glutMainLoopEvent();
+	glutMainLoop();
+	//glutMainLoopEvent();
 
 	return 0;					// This line is never reached
 }
