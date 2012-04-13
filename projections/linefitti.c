@@ -20,11 +20,10 @@
 
 #include <stdlib.h>
 #include <GL/glut.h>
-#include <GL/glu.h>
 #include <stdio.h>
-#include <math.h>
+#include <math.h> //M_PI
 
-#define MAXPTS 300
+#define MAXPTS 500
 
 #define INACTIVE GLUT_UP 
 #define ACTIVE GLUT_DOWN
@@ -80,27 +79,11 @@ void mouseManager( int button, int state, int x, int y ) {
 
 	if(state==GLUT_DOWN){
 		addNewPoint( xPos, yPos, INACTIVE );
-		/*
-		addNewPoint( xPos, yPos, INACTIVE );
-		addNewPoint( xPos, yPos, INACTIVE );
-		addNewPoint( xPos, yPos, ACTIVE );
-		*/
+
 	} else {
 		addNewPoint( xPos, yPos, INACTIVE );
 	}
 	glutPostRedisplay();
-
-	/*
-	if ( button==GLUT_LEFT_BUTTON && state==GLUT_DOWN ) {
-		float xPos = ((float)x)/((float)(WindowWidth-1));
-		float yPos = ((float)y)/((float)(WindowHeight-1));
-
-		yPos = 1.0f-yPos;			// Flip value since y position is from top row.
-
-		addNewPoint( xPos, yPos, ACTIVE );
-		glutPostRedisplay();
-	}
-	*/
 }
 
 // Left button presses place a control point.
@@ -135,6 +118,13 @@ void removeLastPoint() {
 
 // Move the pointer to the starting position
 void removeAllPoints() {
+	int i;
+	for(i=0;i<NumPts;i++){
+		PointArray[i][0] = 0;
+		PointArray[i][1] = 0;
+		PointArray[i][2] = INACTIVE;
+
+	}
 	NumPts = 0;
 
 }
@@ -163,8 +153,6 @@ void addNewPoint( float x, float y, int state ) {
 
 	
 void displayLines(void){
-
-
 	int i;
 
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -183,8 +171,6 @@ void displayLines(void){
 				olVertex( PointArray[i][0], PointArray[i][1], C_WHITE );
 			}
 
-				
-			
 			glVertex2f( PointArray[i][0], PointArray[i][1] );
 		}
 		olEnd();
@@ -255,7 +241,7 @@ int main(int argc, char** argv){
 	glutMotionFunc(mouseMovedPressed);
 	glutPassiveMotionFunc(mouseMoved);
 
-	glutMainLoop();
+	glutMainLoopEvent();
 
 	return 0;					// This line is never reached
 }
