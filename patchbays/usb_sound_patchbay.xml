@@ -1,0 +1,22 @@
+<!DOCTYPE patchbay>
+<patchbay version="0.3.8" name="usb_sound_patchbay">
+ <output-sockets>
+  <socket exclusive="off" client="libol" type="jack-audio" name="OUT">
+   <plug>out_x</plug>
+   <plug>out_y</plug>
+   <plug>out_g</plug>
+  </socket>
+ </output-sockets>
+ <input-sockets>
+  <socket exclusive="off" client="simulator" type="jack-audio" name="USB_SOUND">
+   <plug>playback_3</plug>
+   <plug>playback_4</plug>
+   <plug>playback_8</plug>
+  </socket>
+ </input-sockets>
+ <slots/>
+ <cables>
+  <cable output="OUT" input="USB_SOUND" type="jack-audio"/>
+ </cables>
+</patchbay>
+
