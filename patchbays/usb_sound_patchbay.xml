@@ -8,7 +8,7 @@
   </socket>
  </output-sockets>
  <input-sockets>
-  <socket exclusive="off" client="simulator" type="jack-audio" name="USB_SOUND">
+  <socket exclusive="off" client="system" type="jack-audio" name="USB_SOUND">
    <plug>playback_3</plug>
    <plug>playback_4</plug>
    <plug>playback_8</plug>
