@@ -1,0 +1,10 @@
+include_directories (${CMAKE_SOURCE_DIR}/include)
+link_directories (${CMAKE_BINARY_DIR}/libol)
+
+if(OPENGL_FOUND AND GLUT_FOUND)
+  add_executable(linefitti linefitti.c)
+  include_directories(${OPENGL_INCLUDE_DIRS} ${GLUT_INCLUDE_DIRS})
+  target_link_libraries(linefitti m ${OPENGL_LIBRARIES} ${GLUT_LIBRARY} ${JACK_LIBRARIES} openlase)
+else()
+  message(STATUS "Will NOT build linefitti (OpenGL or GLUT missing)")
+endif()
