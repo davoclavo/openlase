@@ -100,13 +100,12 @@ void mouseMovedPressed( int x, int y ) {
 
 // Left button presses place a control point.
 void mouseMoved( int x, int y ) {
-	
+	/*
 	float xPos = ((float)x-(float)(WindowWidth)/2)/((float)(WindowWidth)/2);
 	float yPos = ((float)y)/((float)(WindowHeight)/2);
-	//printf("x: %d, y: %d -- xPos: %f, yPos: %f\n",x,y,xPos,yPos);
-	yPos = 1.0f-yPos;			// Flip value since y position is from top row.
-	
-	glutPostRedisplay();
+	yPos = 1.0f-yPos;			// Flip value since y position is from top row.	
+	printf("x: %d, y: %d -- xPos: %f, yPos: %f\n",x,y,xPos,yPos);
+	*/
 }
 
 // Decrease the pointer
