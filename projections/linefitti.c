@@ -72,7 +72,7 @@ void removeFirstPoint() {
 void mouseManager( int button, int state, int x, int y ) {
 	printf("button: %d, state: %d\n",button, state);
 
-	float xPos = ((float)x-(float)(WindowWidth)/2)/((float)(WindowWidth)/2);
+	float xPos = -((float)x-(float)(WindowWidth)/2)/((float)(WindowWidth)/2);
 	float yPos = ((float)y)/((float)(WindowHeight)/2);
 
 	yPos = 1.0f-yPos;			// Flip value since y position is from top row.
@@ -88,7 +88,7 @@ void mouseManager( int button, int state, int x, int y ) {
 
 // Left button presses place a control point.
 void mouseMovedPressed( int x, int y ) {
-	float xPos = ((float)x-(float)(WindowWidth)/2)/((float)(WindowWidth)/2);
+	float xPos = -((float)x-(float)(WindowWidth)/2)/((float)(WindowWidth)/2);
 	float yPos = ((float)y)/((float)(WindowHeight)/2);
 
 	yPos = 1.0f-yPos;			// Flip value since y position is from top row.
@@ -164,7 +164,7 @@ void displayLines(void){
 				olVertex( PointArray[i][0], PointArray[i][1], C_BLACK );
 
 			} else {
-				glColor3f(0.0f, 0.0f, 1.0f); // White line
+				glColor3f(0.0f, 1.0f, 0.0f); // White line
 				olVertex( PointArray[i][0], PointArray[i][1], C_WHITE );
 			}
 
@@ -192,7 +192,7 @@ void resizeWindow(int w, int h){
 	glViewport(0, 0, (GLsizei) w, (GLsizei) h);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluOrtho2D(-1,1,-1,1);  // Always view [0,1]x[0,1].
+	gluOrtho2D(1,-1,-1,1);  // Always view [0,1]x[0,1].
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 }
