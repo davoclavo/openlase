@@ -164,7 +164,7 @@ void displayLines(void){
 				olVertex( PointArray[i][0], PointArray[i][1], C_BLACK );
 
 			} else {
-				glColor3f(1.0f, 1.0f, 1.0f); // White line
+				glColor3f(0.0f, 0.0f, 1.0f); // White line
 				olVertex( PointArray[i][0], PointArray[i][1], C_WHITE );
 			}
 
@@ -234,10 +234,9 @@ int main(int argc, char** argv){
 
 	glutMouseFunc(mouseManager);
 	glutMotionFunc(mouseMovedPressed);
-	glutPassiveMotionFunc(mouseMoved);
+	//glutPassiveMotionFunc(mouseMoved);
 
 	glutMainLoop();
-	//glutMainLoopEvent();
 
 	return 0;					// This line is never reached
 }
