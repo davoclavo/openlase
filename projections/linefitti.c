@@ -23,7 +23,7 @@
 #include <stdio.h>
 #include <math.h> //M_PI
 
-#define MAXPOINTS 500
+#define MAXPOINTS 300
 
 #define INACTIVE GLUT_UP 
 #define ACTIVE GLUT_DOWN
@@ -126,7 +126,7 @@ void addNewPoint( float x, float y, int state ) {
 	PointArray[thispoint][1] = y;
 	PointArray[thispoint][2] = state;
 	thispoint = nextpoint; 
-	PointArray[(nextpoint+1)%MAXPOINTS][2] = state;
+	PointArray[(nextpoint+1)%MAXPOINTS][2] = INACTIVE;
 	
 
 
