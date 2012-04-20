@@ -23,48 +23,32 @@
 #include <stdio.h>
 #include <math.h> //M_PI
 
-#define MAXPTS 500
+#define MAXPOINTS 500
 
 #define INACTIVE GLUT_UP 
 #define ACTIVE GLUT_DOWN
 
-float PointArray[MAXPTS][3]; // 0: x, 1: y, 2: state
-int NumPts = 0; // Point stack pointer
+#define RESOLUTION 3 //In pixels, it describes the allowance to draw a point next to other
+
+float PointArray[MAXPOINTS][3]; // 0: x, 1: y, 2: state
+int thispoint = 0; // Last point stack pointer
 
 // Window size in pixels
 int WindowHeight;
 int WindowWidth;
 
+float normresolution; //Normalized resolution [0-1]
+
 // Key, mouse X, mouse Y
-void myKeyboardFunc (unsigned char key, int x, int y){
+void keyboardManager(unsigned char key, int x, int y){
 	switch (key) {
 	case ' ':
 		removeAllPoints();
 		glutPostRedisplay();
 		break;
-	case 'd':
-		removeFirstPoint();
-		glutPostRedisplay();
-		break;
-	case 'f':
-		removeLastPoint();
-		glutPostRedisplay();
-		break;
 	case 27:			// Escape key
 		exit(0);
 		break;
-	}
-}
-
-void removeFirstPoint() {
-	int i;
-	if ( NumPts>0 ) {
-		// Remove the first point, slide the rest down
-		NumPts--;
-		for ( i=0; i<NumPts; i++ ) {
-			PointArray[i][0] = PointArray[i+1][0];
-			PointArray[i][1] = PointArray[i+1][1];
-		}
 	}
 }
 
@@ -78,15 +62,14 @@ void mouseManager( int button, int state, int x, int y ) {
 	yPos = 1.0f-yPos;			// Flip value since y position is from top row.
 
 	if(state==GLUT_DOWN){
-		addNewPoint( xPos, yPos, INACTIVE );
-
-	} else {
-		addNewPoint( xPos, yPos, INACTIVE );
+		//NOTHING LOL
 	}
-	glutPostRedisplay();
+
+	addNewPoint( xPos, yPos, INACTIVE );
+	
 }
 
-// Left button presses place a control point.
+// Mouse moved while pressing a button.
 void mouseMovedPressed( int x, int y ) {
 	float xPos = -((float)x-(float)(WindowWidth)/2)/((float)(WindowWidth)/2);
 	float yPos = ((float)y)/((float)(WindowHeight)/2);
@@ -94,11 +77,9 @@ void mouseMovedPressed( int x, int y ) {
 	yPos = 1.0f-yPos;			// Flip value since y position is from top row.
 	
 	addNewPoint( xPos, yPos, ACTIVE );
-	
-	glutPostRedisplay();
 }
 
-// Left button presses place a control point.
+// Mouse moved without pressing a button.
 void mouseMoved( int x, int y ) {
 	/*
 	float xPos = ((float)x-(float)(WindowWidth)/2)/((float)(WindowWidth)/2);
@@ -108,71 +89,80 @@ void mouseMoved( int x, int y ) {
 	*/
 }
 
-// Decrease the pointer
-void removeLastPoint() {
-	if ( NumPts>0 ) {
-		PointArray[NumPts][2] = INACTIVE;
-		NumPts--;
-	}
-}
-
 // Move the pointer to the starting position
 void removeAllPoints() {
 	int i;
-	for(i=0;i<MAXPTS;i++){
+	for(i=0;i<MAXPOINTS;i++){
 		PointArray[i][0] = 0;
 		PointArray[i][1] = 0;
 		PointArray[i][2] = INACTIVE;
 
 	}
-	NumPts = 0;
+	thispoint = 0;
 }
 
 // Add a new point to the end of the list.  
 // Remove the first point in the list if too many points.
 void addNewPoint( float x, float y, int state ) {
-	if ( NumPts>=MAXPTS ) {
-		NumPts = 0;
-		//removeFirstPoint();
+	//Avoid overflow with %MAXPOINTS
+	int lastpoint = (MAXPOINTS+thispoint-1)%MAXPOINTS,
+		nextpoint = (thispoint+1)%MAXPOINTS;
+
+
+
+	
+	float dist = sqrt(pow((x-PointArray[lastpoint][0]),2)+pow(y-PointArray[lastpoint][1],2));
+	//printf("Distance between %d and %d is %f\n", thispoint, lastpoint,dist);
+	
+
+	if(state == ACTIVE && dist < normresolution){
+		printf(".");
+		return;
 	}
+	printf("%d) x: %f, y: %f, st: %d\n",thispoint,x,y,state);
 
-	PointArray[NumPts][0] = x;
-	PointArray[NumPts][1] = y;
-	PointArray[NumPts][2] = state;
 
-	//PointArray[NumPts+1][2] = INACTIVE;
+	PointArray[thispoint][0] = x;
+	PointArray[thispoint][1] = y;
+	PointArray[thispoint][2] = state;
+	thispoint = nextpoint; 
+	PointArray[(nextpoint+1)%MAXPOINTS][2] = state;
+	
 
-	printf("%d) x: %f, y: %f, st: %d\n",NumPts,x,y,state);
 
-	NumPts++;
+
+	glutPostRedisplay();
 }
 
 
 	
 void displayLines(void){
-	int i;
+	//printf("DISPLAY LINES!\n");
+	int i, j;
 
 	glClear(GL_COLOR_BUFFER_BIT);
 	olLoadIdentity();
 	
-	if ( NumPts>1 ) {
-		glBegin( GL_LINE_STRIP );
-		olBegin(OL_LINESTRIP);
-		for ( i=0; i<MAXPTS; i++ ) {
-			if(PointArray[i][2] == INACTIVE || i == NumPts || i == NumPts-1){
-				glColor3f(0.0f, 0.0f, 0.0f); // Black line
-				olVertex( PointArray[i][0], PointArray[i][1], C_BLACK );
-
-			} else {
-				glColor3f(0.0f, 1.0f, 0.0f); // White line
-				olVertex( PointArray[i][0], PointArray[i][1], C_WHITE );
-			}
-
-			glVertex2f( PointArray[i][0], PointArray[i][1] );
+	
+	glBegin( GL_LINE_STRIP );
+	olBegin(OL_LINESTRIP);
+	for ( i=0; i<MAXPOINTS; i++ ) {
+		j = (thispoint + i)%MAXPOINTS;
+		// Skip if this point is inactive or if it is the current point (to not close the cycle)
+		if(PointArray[j][2] == INACTIVE || 
+			j == thispoint || j == ((MAXPOINTS+thispoint-1)%MAXPOINTS)){
+			glColor4f(1.0f, 0.0f, 0.0f, 0.0f); // Black line
+			olVertex( PointArray[j][0], PointArray[j][1], C_BLACK );
+		} else {
+			glColor3f(0.0f, 1.0f, 0.0f); // Green line
+			olVertex( PointArray[j][0], PointArray[j][1], C_GREEN );
 		}
-		olEnd();
-		glEnd();
+
+		glVertex2f( PointArray[j][0], PointArray[j][1] );
 	}
+	olEnd();
+	glEnd();
+	
 	olRenderFrame(60);
 
 	glFlush();
@@ -181,9 +171,13 @@ void displayLines(void){
 void initRendering() {
 	glClearColor( 0.0f, 0.0f, 0.0f, 0.0f ); // Black background
 	glLineWidth(1); // Line width
-
+	removeAllPoints();
 	//glEnable(GL_LINE_SMOOTH);
-	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);		// Antialias the lines
+	//glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);		// Antialias the lines
+
+	//Allow transparency, it only affects the usage of the gl ui, so lines are not overlapped with black lines
+	glEnable(GL_BLEND); 
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 void resizeWindow(int w, int h){
@@ -195,6 +189,10 @@ void resizeWindow(int w, int h){
 	gluOrtho2D(1,-1,-1,1);  // Always view [0,1]x[0,1].
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
+
+	normresolution = (float)RESOLUTION/((WindowHeight)/2);
+	printf("Normalized resolution: %f\n",normresolution);
+
 }
 
 int main(int argc, char** argv){
@@ -230,7 +228,7 @@ int main(int argc, char** argv){
 
 	glutDisplayFunc(displayLines);
 	glutReshapeFunc(resizeWindow);
-	glutKeyboardFunc(myKeyboardFunc);
+	glutKeyboardFunc(keyboardManager);
 
 	glutMouseFunc(mouseManager);
 	glutMotionFunc(mouseMovedPressed);
