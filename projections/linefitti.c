@@ -27,6 +27,7 @@
 
 #define INACTIVE GLUT_UP 
 #define ACTIVE GLUT_DOWN
+#define NEW 9
 
 #define RESOLUTION 3 //In pixels, it describes the allowance to draw a point next to other
 
@@ -95,7 +96,7 @@ void removeAllPoints() {
 	for(i=0;i<MAXPOINTS;i++){
 		PointArray[i][0] = 0;
 		PointArray[i][1] = 0;
-		PointArray[i][2] = INACTIVE;
+		PointArray[i][2] = NEW;
 
 	}
 	thispoint = 0;
@@ -146,7 +147,7 @@ void displayLines(void){
 	
 	glBegin( GL_LINE_STRIP );
 	olBegin(OL_LINESTRIP);
-	for ( i=0; i<MAXPOINTS; i++ ) {
+	for ( i=0; i<MAXPOINTS && PointArray[i][3] != NEW; i++ ) {
 		j = (thispoint + i)%MAXPOINTS;
 		// Skip if this point is inactive or if it is the current point (to not close the cycle)
 		if(PointArray[j][2] == INACTIVE || 
